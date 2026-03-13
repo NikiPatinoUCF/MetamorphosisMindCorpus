@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metamorphosis of the Mind — MG Vocabulary Field</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0a0a;
+    --surface: #141010;
+    --border: #261e1e;
+    --text: #c8b8b0;
+    --dim: #554444;
+    --accent: #c87e7e;
+    --accent2: #c8a96e;
+    --accent3: #7eb8c8;
+    --highlight: #f0e0d8;
+    --font-mono: 'DM Mono', monospace;
+    --font-serif: 'Cormorant Garamond', serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 48px 40px;
+  }
+
+  .header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; }
+  .challenge-label { font-size: 10px; letter-spacing: 0.2em; color: var(--dim); text-transform: uppercase; margin-bottom: 8px; }
+
+  h1 { font-family: var(--font-serif); font-size: 32px; font-weight: 300; color: var(--highlight); font-style: italic; margin-bottom: 6px; }
+  .subtitle { font-size: 11px; color: var(--dim); letter-spacing: 0.12em; }
+
+  .prompt-block {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border: 1px solid #261e1e;
+    background: rgba(200,126,126,0.03);
+    border-left: 2px solid var(--accent);
+    max-width: 680px;
+  }
+
+  .prompt-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .prompt-text {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-style: italic;
+    color: #806060;
+    line-height: 1.7;
+  }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+
+  .panel { border: 1px solid var(--border); padding: 24px; background: var(--surface); }
+  .panel-title { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label { width: 120px; font-size: 12px; color: var(--text); flex-shrink: 0; text-align: right; }
+  .bar-label.mg { color: var(--accent); }
+  .bar-label.niki { color: var(--accent2); }
+  .bar-track { flex: 1; height: 2px; background: #1e1414; position: relative; }
+  .bar-fill { height: 100%; }
+  .bar-fill.mg { background: var(--accent); }
+  .bar-fill.niki { background: var(--accent2); }
+  .bar-count { width: 28px; font-size: 11px; color: var(--dim); text-align: right; flex-shrink: 0; }
+
+  .vocab-field { position: relative; height: 340px; border: 1px solid var(--border); background: var(--surface); overflow: hidden; margin-bottom: 32px; }
+  .vocab-field-title { position: absolute; top: 16px; left: 20px; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim); z-index: 10; }
+
+  .vocab-word { position: absolute; cursor: pointer; transition: color 0.2s, opacity 0.2s; white-space: nowrap; font-family: var(--font-mono); }
+  .vocab-word:hover { opacity: 1 !important; }
+  .vocab-word.mg-term { color: var(--accent); }
+  .vocab-word.corpus-only { color: #2e1e1e; }
+  .vocab-word.niki-strong { color: var(--accent2); }
+
+  .tooltip { position: fixed; background: #150f0f; border: 1px solid var(--accent); padding: 10px 14px; font-size: 11px; color: var(--text); pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 100; max-width: 220px; line-height: 1.6; }
+  .tooltip.visible { opacity: 1; }
+  .tooltip .t-word { color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; }
+
+  .matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 32px; }
+  .matrix-cell { background: var(--surface); padding: 20px 16px; }
+  .matrix-cell-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; }
+  .matrix-words { display: flex; flex-wrap: wrap; gap: 6px; }
+  .matrix-word { font-size: 11px; padding: 2px 6px; border: 1px solid var(--border); color: var(--text); }
+  .matrix-word.present { border-color: var(--accent); color: var(--accent); background: rgba(200,126,126,0.05); }
+  .matrix-word.absent { color: #241a1a; border-color: #1c1414; }
+  .matrix-word.owned { border-color: var(--accent2); color: var(--accent2); background: rgba(200,169,110,0.05); }
+
+  .finding { border-left: 2px solid var(--accent); padding: 16px 20px; margin-bottom: 16px; background: rgba(200,126,126,0.03); }
+  .finding-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .finding-text { font-family: var(--font-serif); font-size: 15px; color: var(--highlight); line-height: 1.7; font-style: italic; }
+  .finding-text em { font-style: normal; color: var(--accent); }
+  .finding-text strong { font-style: normal; color: var(--accent2); font-weight: 400; }
+
+  .legend { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 0.1em; color: var(--dim); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .section-gap { margin-bottom: 40px; }
+
+  /* Absence panel — terms the corpus uses that Niki does not */
+  .absence-panel {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .absence-row {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .absence-col { flex: 1; min-width: 180px; }
+  .absence-col-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; }
+
+  .absent-word { font-size: 12px; color: #3a2828; margin-bottom: 6px; }
+  .absent-word span { color: var(--dim); font-size: 11px; }
+
+  .owned-word { font-size: 12px; color: var(--accent2); margin-bottom: 6px; }
+  .owned-word span { color: var(--dim); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="challenge-label">Vocal Media Challenge 03 · Corpus Analysis · Machine Gospel Vocabulary Research</div>
+  <h1>Metamorphosis of the Mind</h1>
+  <div class="subtitle">10 submissions · visceral-corporeal register · meat / discipline / worth / hunger</div>
+  <div class="prompt-block">
+    <div class="prompt-label">challenge prompt</div>
+    <div class="prompt-text">Share a transformative moment from your mental or emotional journey. Not the polished, triumphant kind — but the messy, vulnerable kind. The kind that begins with unraveling and ends with something closer to clarity.</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#c87e7e"></div> MG-relevant term present in corpus</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#c8a96e"></div> Term owned exclusively by Niki</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2e1e1e"></div> Corpus term without MG relevance</div>
+</div>
+
+<div class="vocab-field" id="vocabField3">
+  <div class="vocab-field-title">Corpus Vocabulary Field — size = frequency · color = MG relevance</div>
+</div>
+
+<div class="grid section-gap">
+  <div class="panel">
+    <div class="panel-title">MG-Relevant Terms — Full Corpus Frequency</div>
+    <div id="mgBars3"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Niki's Submission — Owned MG Vocabulary</div>
+    <div id="nikiBars3"></div>
+  </div>
+</div>
+
+<!-- Absence / Ownership panel -->
+<div class="absence-panel">
+  <div class="panel-title" style="margin-bottom:16px">Vocabulary Divergence — what the corpus uses that Niki doesn't, and what Niki uses that no one else does</div>
+  <div class="absence-row">
+    <div class="absence-col">
+      <div class="absence-col-label">Corpus heals through — Niki: 0×</div>
+      <div class="absent-word">pain <span>×9 in corpus</span></div>
+      <div class="absent-word">remember <span>×7 in corpus</span></div>
+      <div class="absent-word">love <span>×7 in corpus</span></div>
+      <div class="absent-word">hope <span>×6 in corpus</span></div>
+      <div class="absent-word">heal <span>×5 in corpus</span></div>
+      <div class="absent-word">better <span>×8 in corpus</span></div>
+    </div>
+    <div class="absence-col">
+      <div class="absence-col-label">Niki owns — corpus: 0×</div>
+      <div class="owned-word">meat <span>×6</span></div>
+      <div class="owned-word">discipline <span>×3</span></div>
+      <div class="owned-word">appetite <span>×4</span></div>
+      <div class="owned-word">hunger <span>×7</span></div>
+      <div class="owned-word">taste <span>×7</span></div>
+      <div class="owned-word">worth <span>×5</span></div>
+    </div>
+    <div class="absence-col">
+      <div class="absence-col-label">The structural difference</div>
+      <p style="font-size:12px;color:var(--dim);line-height:1.7;font-family:var(--font-serif);font-style:italic">The corpus narrated its way to healing. Niki digested. The corpus used emotional vocabulary. Niki used somatic vocabulary. <em style="color:var(--accent2)">Discipline</em> appears in zero other documents across all three corpora.</p>
+    </div>
+  </div>
+</div>
+
+<div class="panel-title" style="margin-bottom:12px">MG Register Matrix — which terms this corpus activates</div>
+<div class="matrix" id="matrix3"></div>
+
+<div class="section-gap">
+  <div class="finding">
+    <div class="finding-label">Corpus Finding</div>
+    <div class="finding-text">The Metamorphosis corpus heals by <em>narrating</em> — pain, remember, love, hope appear as the instruments of transformation. The corpus metabolizes experience through language. It tells its way through.</div>
+  </div>
+  <div class="finding">
+    <div class="finding-label">MG Vocabulary Confirmed</div>
+    <div class="finding-text">The visceral-corporeal register lives here: <em>body, skin, face, hands, inside, pain, feet, break, fall, blood, voice, quiet</em>. But Niki's owned terms — <strong>meat, hunger, taste, appetite, discipline, worth</strong> — go further than the corpus's register. They are not just about the body. They are about what the body is made to do.</div>
+  </div>
+  <div class="finding">
+    <div class="finding-label">Unique Signal</div>
+    <div class="finding-text"><em>Worth</em> sits between <em>skin</em> and <em>bones</em> in Niki's frequency map. <strong>Discipline</strong> appears in zero documents across all three corpora except Niki's. The corpus asked: <em>what happened to me?</em> Niki asked: <em>what was I made to become, and at what cost?</em> That question is MG's engine.</div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const mgTerms = {
+  'will':26,'world':18,'words':16,'help':15,'inside':13,'mother':13,'body':13,
+  'face':12,'skin':12,'safe':12,'home':11,'told':11,'broken':10,'past':10,
+  'child':10,'quiet':9,'write':9,'said':9,'keep':9,'fall':9,'hands':9,'pain':9,
+  'feet':8,'kept':8,'process':8,'dark':7,'voice':7,'remember':7,'love':7,'break':7
+};
+
+const nikiTerms = {
+  'taste':7,'hunger':7,'meat':6,'bones':5,'skin':5,'worth':5,'appetite':4,
+  'hands':4,'inside':3,'discipline':3,'face':2,'silence':2,'past':2,'fire':2,
+  'language':2,'body':2,'blood':1,'named':1,'cut':1,'said':1,'word':1,
+  'rules':1,'memory':1,'bone':1,'hurt':1
+};
+
+const allCorpusTop = [
+  {w:'one',c:62,mg:false},{w:'life',c:56,mg:false},{w:'time',c:53,mg:false},
+  {w:'felt',c:38,mg:false},{w:'could',c:36,mg:false},{w:'back',c:35,mg:false},
+  {w:'day',c:31,mg:false},{w:'never',c:29,mg:false},{w:'way',c:29,mg:false},
+  {w:'something',c:28,mg:false},{w:'work',c:26,mg:false},{w:'will',c:26,mg:true},
+  {w:'years',c:25,mg:false},{w:'moment',c:25,mg:false},{w:'always',c:23,mg:false},
+  {w:'still',c:23,mg:false},{w:'wanted',c:20,mg:false},{w:'found',c:20,mg:false},
+  {w:'world',c:18,mg:true},{w:'words',c:16,mg:true},{w:'help',c:15,mg:true},
+  {w:'inside',c:13,mg:true},{w:'mother',c:13,mg:true},{w:'body',c:13,mg:true},
+  {w:'face',c:12,mg:true},{w:'skin',c:12,mg:true},{w:'safe',c:12,mg:true},
+  {w:'home',c:11,mg:true},{w:'told',c:11,mg:true},{w:'broken',c:10,mg:true},
+  {w:'child',c:10,mg:true},{w:'quiet',c:9,mg:true},{w:'hands',c:9,mg:true},
+  {w:'pain',c:9,mg:true},{w:'feet',c:8,mg:true},{w:'dark',c:7,mg:true},
+  {w:'voice',c:7,mg:true},{w:'remember',c:7,mg:true},{w:'love',c:7,mg:true},
+  {w:'break',c:7,mg:true}
+];
+
+const mgRegisters = {
+  'VISCERAL / CORPOREAL': ['body','skin','bones','face','hands','blood','pain','feet','meat','hunger','taste','appetite','flesh','weight','muscle','throat','breath'],
+  'FORCE / DISCIPLINE': ['force','will','discipline','silence','obey','submit','hold','press','cut','remove','break','inside','push','press','word'],
+  'WORTH / TRANSMISSION': ['worth','named','memory','past','taught','inherit','kept','language','told','record','child','mother','rules','cost','price']
+};
+
+function buildVocabField(containerId, terms, nikiT) {
+  const container = document.getElementById(containerId);
+  const w = container.offsetWidth;
+  const h = container.offsetHeight;
+  const placed = [];
+  const sorted = [...terms].sort((a,b) => b.c - a.c).slice(0, 50);
+  const max = sorted[0].c;
+
+  sorted.forEach((item) => {
+    const el = document.createElement('div');
+    el.className = 'vocab-word';
+    const size = Math.max(9, Math.min(26, 9 + (item.c / max) * 17));
+    el.style.fontSize = size + 'px';
+    el.textContent = item.w;
+
+    const isNiki = nikiT[item.w] && !item.mg;
+    const isMG = item.mg;
+
+    if (isNiki) el.classList.add('niki-strong');
+    else if (isMG) el.classList.add('mg-term');
+    else el.classList.add('corpus-only');
+
+    el.style.opacity = isMG ? '0.85' : isNiki ? '0.9' : '0.2';
+
+    let placed_ok = false;
+    let attempts = 0;
+    while (!placed_ok && attempts < 80) {
+      const x = 30 + Math.random() * (w - 160);
+      const y = 50 + Math.random() * (h - 80);
+      const tooClose = placed.some(p => Math.abs(p.x - x) < 90 && Math.abs(p.y - y) < 22);
+      if (!tooClose) {
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        placed.push({x, y});
+        placed_ok = true;
+      }
+      attempts++;
+    }
+    if (!placed_ok) {
+      el.style.left = (30 + Math.random() * (w-120)) + 'px';
+      el.style.top = (50 + Math.random() * (h-60)) + 'px';
+    }
+
+    el.addEventListener('mouseenter', (e) => {
+      const tip = document.getElementById('tooltip');
+      const iN = nikiT[item.w];
+      tip.innerHTML = `<span class="t-word">${item.w}</span>corpus: ${item.c}×${iN ? '<br>niki: ' + iN + '×' : ''}${isMG ? '<br><span style="color:#c87e7e;font-size:10px">↳ MG register</span>' : ''}`;
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY - 10) + 'px';
+      tip.classList.add('visible');
+    });
+    el.addEventListener('mouseleave', () => document.getElementById('tooltip').classList.remove('visible'));
+    el.addEventListener('mousemove', (e) => {
+      const tip = document.getElementById('tooltip');
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY - 10) + 'px';
+    });
+
+    container.appendChild(el);
+  });
+}
+
+function buildBars(containerId, terms, colorClass) {
+  const container = document.getElementById(containerId);
+  const sorted = Object.entries(terms).sort((a,b) => b[1]-a[1]).slice(0,18);
+  const maxVal = sorted[0][1];
+  sorted.forEach(([w, c]) => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label ${colorClass}">${w}</div>
+      <div class="bar-track"><div class="bar-fill ${colorClass}" style="width:${(c/maxVal*100)}%"></div></div>
+      <div class="bar-count">${c}</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function buildMatrix(containerId, registers, corpusTerms, nikiT) {
+  const container = document.getElementById(containerId);
+  Object.entries(registers).forEach(([reg, words]) => {
+    const cell = document.createElement('div');
+    cell.className = 'matrix-cell';
+    cell.innerHTML = `<div class="matrix-cell-label">${reg}</div><div class="matrix-words"></div>`;
+    const wordsDiv = cell.querySelector('.matrix-words');
+    words.forEach(w => {
+      const span = document.createElement('span');
+      span.className = 'matrix-word';
+      const inCorpus = corpusTerms[w];
+      const inNiki = nikiT[w];
+      if (inNiki && !inCorpus) {
+        span.classList.add('owned');
+        span.title = `niki only: ${inNiki}×`;
+      } else if (inCorpus || inNiki) {
+        span.classList.add('present');
+        span.title = `corpus: ${inCorpus||0}× / niki: ${inNiki||0}×`;
+      } else {
+        span.classList.add('absent');
+      }
+      span.textContent = w;
+      wordsDiv.appendChild(span);
+    });
+    container.appendChild(cell);
+  });
+}
+
+buildVocabField('vocabField3', allCorpusTop, nikiTerms);
+buildBars('mgBars3', mgTerms, 'mg');
+buildBars('nikiBars3', nikiTerms, 'niki');
+buildMatrix('matrix3', mgRegisters, mgTerms, nikiTerms);
+</script>
+</body>
+</html>
